@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MATH ADVENTURE SMA - Aplikasi Belajar Matematika SMA Interaktif</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        math: {
+                            gold: '#f59e0b',
+                            green: '#10b981',
+                            red: '#ef4444',
+                            purple: '#8b5cf6',
+                            cyan: '#06b6d4'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .math-font {
+            font-family: 'Fira Code', monospace;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(99, 102, 241, 0.8); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pop-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col pb-20 md:pb-0 transition-colors duration-200">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navTo('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-math-purple flex items-center justify-center text-white font-black text-xl shadow-md">
+                    ∑
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 via-math-purple to-math-cyan bg-clip-text text-transparent">
+                        MATH ADVENTURE
+                    </h1>
+                    <span class="text-[10px] font-bold text-brand-500 uppercase tracking-wider block -mt-1">Edukasi SMA Interaktif</span>
+                </div>
+            </div>
+
+            <!-- Header Quick Stats -->
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <!-- Streak Counter -->
+                <div class="flex items-center space-x-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full text-xs font-bold border border-amber-500/20" title="Streak Belajar">
+                    <i class="fa-solid font-bold fa-fire animate-bounce"></i>
+                    <span id="header-streak">0</span> <span class="hidden sm:inline">Hari</span>
+                </div>
+
+                <!-- XP Badge -->
+                <div class="flex items-center space-x-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-full text-xs font-bold border border-indigo-500/20" title="Total XP">
+                    <i class="fa-solid fa-bolt text-math-gold"></i>
+                    <span id="header-xp">0</span> <span class="hidden sm:inline">XP</span>
+                </div>
+
+                <!-- Level Badge -->
+                <div class="flex items-center space-x-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-500/20" title="Level Pemain">
+                    <i class="fa-solid fa-trophy text-amber-500"></i>
+                    <span>Lvl <span id="header-level">1</span></span>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <button onclick="app.toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main id="app-content" class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 overflow-x-hidden">
+        <!-- Dynamic Views will be injected here via JavaScript -->
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 md:hidden">
+        <div class="flex justify-around items-center max-w-md mx-auto">
+            <button onclick="app.navTo('home')" id="nav-btn-home" class="nav-item flex flex-col items-center py-1 px-3 text-brand-600 dark:text-brand-400 font-medium text-xs">
+                <i class="fa-solid fa-house text-lg mb-0.5"></i>
+                <span>Beranda</span>
+            </button>
+            <button onclick="app.navTo('belajar')" id="nav-btn-belajar" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-book-open text-lg mb-0.5"></i>
+                <span>Belajar</span>
+            </button>
+            <button onclick="app.navTo('latihan-select')" id="nav-btn-game" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-gamepad text-lg mb-0.5"></i>
+                <span>Latihan</span>
+            </button>
+            <button onclick="app.navTo('rumus')" id="nav-btn-rumus" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-square-root-variable text-lg mb-0.5"></i>
+                <span>Rumus</span>
+            </button>
+            <button onclick="app.navTo('profil')" id="nav-btn-profil" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-user text-lg mb-0.5"></i>
+                <span>Profil</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Reusable Modal overlay -->
+    <div id="app-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden animate-pop">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative">
+            <button onclick="app.closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-content">
+                <!-- Modal content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Sound Synthesizer (100% offline, zero external audio dependency)
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+            playTone(freq, type = 'sine', duration = 0.15, vol = 0.1) {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+            click() { this.playTone(600, 'sine', 0.05, 0.05); }
+            correct() { 
+                this.playTone(523.25, 'triangle', 0.1, 0.1); 
+                setTimeout(() => this.playTone(659.25, 'triangle', 0.1, 0.1), 80);
+                setTimeout(() => this.playTone(783.99, 'triangle', 0.2, 0.1), 160);
+            }
+            wrong() { 
+                this.playTone(220, 'sawtooth', 0.15, 0.1); 
+                setTimeout(() => this.playTone(180, 'sawtooth', 0.25, 0.1), 120);
+            }
+            fanfare() {
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    setTimeout(() => this.playTone(f, 'sine', 0.25, 0.12), i * 100);
+                });
+            }
+        }
+        const sfx = new SoundFX();
+
+        // Comprehensive Curriculum Database for SMA Math (X, XI, XII)
+        const CURRICULUM = {
+            kelasX: {
+                title: "Kelas X SMA",
+                badge: "📘 KELAS X",
+                color: "from-blue-600 to-indigo-600",
+                topics: [
+                    {
+                        id: "x-eksponen-log",
+                        title: "Eksponen & Logaritma",
+                        desc: "Sifat-sifat pangkat, bentuk akar, dan operasi logaritma.",
+                        icon: "fa-superscript",
+                        summary: "Eksponen adalah perkalian berulang. Logaritma adalah kebalikan (invers) dari eksponen.",
+                        content: {
+                            pengertian: "Eksponen menyatakan perkalian berulang dari suatu bilangan dasar sebanyak pangkatan tersebut. Logaritma menentukan besar pangkat dari suatu bilangan basis.",
+                            konsep: "1. Jika a^b = c, maka ᵃlog c = b.\n2. Pangkat negatif: a⁻ⁿ = 1/(aⁿ).\n3. Pangkat pecahan: a^(m/n) = ⁿ√(aᵐ).",
+                            rumus: [
+                                { name: "Perkalian Eksponen", eq: "aᵐ × aⁿ = aᵐ⁺ⁿ" },
+                                { name: "Pembagian Eksponen", eq: "aᵐ ÷ aⁿ = aᵐ⁻ⁿ" },
+                                { name: "Sifat Logaritma", eq: "ᵃlog(b × c) = ᵃlog b + ᵃlog c" },
+                                { name: "Sifat Basis Logaritma", eq: "ᵃlog(b/c) = ᵃlog b - ᵃlog c" },
+                                { name: "Pangkat Logaritma", eq: "ᵃlog(bⁿ) = n × ᵃlog b" }
+                            ],
+                            contoh: "Sederhanakan 2³ × 2⁴ ÷ 2².",
+                            pembahasan: "Langkah 1: Gunakan sifat perkalian: 2³⁺⁴ = 2⁷.\nLangkah 2: Gunakan sifat pembagian: 2⁷⁻² = 2⁵ = 32.",
+                            tips: "Pastikan basis (bilangan pokok) sudah sama sebelum menjumlahkan/mengurangkan pangkat!",
+                            kesalahan: "Mengalikan basis saat perpangkatan, contoh: 2³ × 2⁴ disalahartikan menjadi 4⁷ (seharusnya tetap basis 2, yaitu 2⁷).",
+                            rangkuman: "Ingat: Sifat pangkat hanya berlaku pada basis yang identik!"
+                        },
+                        hasInteractive: true,
+                        interactiveType: "exponent"
+                    },
+                    {
+                        id: "x-persamaan-kuadrat",
+                        title: "Persamaan & Pertidaksamaan Kuadrat",
+                        desc: "Akar persamaan kuadrat, rumus ABC, diskriminan & grafik parabola.",
+                        icon: "fa-chart-line",
+                        summary: "Bentuk umum ax² + bx + c = 0. Memiliki nilai Diskriminan D = b² - 4ac.",
+                        content: {
+                            pengertian: "Persamaan kuadrat adalah persamaan polinomial berderajat dua dengan bentuk umum ax² + bx + c = 0 (a ≠ 0).",
+                            konsep: "Akar-akar persamaan kuadrat dapat dicari dengan faktorisasi, melengkapkan kuadrat sempurna, atau rumus ABC.",
+                            rumus: [
+                                { name: "Rumus ABC", eq: "x₁,₂ = (-b ± √(b² - 4ac)) / (2a)" },
+                                { name: "Diskriminan", eq: "D = b² - 4ac" },
+                                { name: "Jumlah Akar", eq: "x₁ + x₂ = -b/a" },
+                                { name: "Hasil Kali Akar", eq: "x₁ × x₂ = c/a" }
+                            ],
+                            contoh: "Tentukan akar-akar dari x² - 5x + 6 = 0.",
+                            pembahasan: "Cari dua bilangan jika dikali hasilnya +6 dan dijumlahkan -5.\nBilangan tersebut adalah -2 dan -3.\n(x - 2)(x - 3) = 0, maka x₁ = 2 dan x₂ = 3.",
+                            tips: "Periksa nilai D: Jika D > 0 (2 akar real), D = 0 (1 akar kembar), D < 0 (akar imajiner).",
+                            kesalahan: "Lupa membagi dengan 2a pada rumus ABC atau salah tanda negatif pada -b.",
+                            rangkuman: "Diskriminan menentukan jenis dan banyaknya titik potong grafik terhadap sumbu-X."
+                        },
+                        hasInteractive: true,
+                        interactiveType: "quadratic"
+                    },
+                    {
+                        id: "x-trigonometri-dasar",
+                        title: "Trigonometri Dasar",
+                        desc: "Sinus, Kosinus, Tangen pada segitiga siku-siku & sudut istimewa.",
+                        icon: "fa-shapes",
+                        summary: "Sin = Demi, Cos = Sami, Tan = Desa.",
+                        content: {
+                            pengertian: "Trigonometri mempelajari hubungan antara panjang sisi dan besar sudut dalam segitiga.",
+                            konsep: "Sisi Depan (de), Sisi Samping (sa), Sisi Miring (mi).\nSin θ = de/mi, Cos θ = sa/mi, Tan θ = de/sa.",
+                            rumus: [
+                                { name: "Sinus", eq: "sin θ = Depan / Miring" },
+                                { name: "Kosinus", eq: "cos θ = Samping / Miring" },
+                                { name: "Tangen", eq: "tan θ = Depan / Samping = sin θ / cos θ" },
+                                { name: "Identitas Utama", eq: "sin²θ + cos²θ = 1" }
+                            ],
+                            contoh: "Jika segitiga siku-siku memiliki depan=3, samping=4, tentukan miring dan sin θ.",
+                            pembahasan: "Miring = √(3² + 4²) = √(9+16) = √25 = 5.\nsin θ = 3 / 5 = 0.6.",
+                            tips: "Hafalkan nilai sudut istimewa 0°, 30°, 45°, 60°, 90° dengan trik pola √0/2, √1/2, √2/2, √3/2, √4/2.",
+                            kesalahan: "Tertukar antara sisi depan dan sisi samping saat sudut acuan dipindahkan.",
+                            rangkuman: "Sisi miring selalu terletak tepat di depan sudut siku-siku (90°)."
+                        },
+                        hasInteractive: true,
+                        interactiveType: "trigonometry"
+                    },
+                    {
+                        id: "x-barisan-deret",
+                        title: "Barisan & Deret",
+                        desc: "Barisan aritmetika (Beda konsisten) & geometri (Rasio konsisten).",
+                        icon: "fa-arrow-trend-up",
+                        summary: "Aritmetika memiliki Beda (b), Geometri memiliki Rasio (r).",
+                        content: {
+                            pengertian: "Barisan adalah urutan bilangan ber pola, sedangkan deret adalah jumlah dari suku-suku barisan tersebut.",
+                            konsep: "Aritmetika menggunakan penjumlahan selisih tetap (b). Geometri menggunakan perkalian faktor tetap (r).",
+                            rumus: [
+                                { name: "Suku ke-n Aritmetika", eq: "Un = a + (n - 1)b" },
+                                { name: "Jumlah n Suku Aritmetika", eq: "Sn = n/2 × (2a + (n - 1)b)" },
+                                { name: "Suku ke-n Geometri", eq: "Un = a × rⁿ⁻¹" }
+                            ],
+                            contoh: "Diketahui barisan 2, 5, 8, 11... Cari suku ke-10.",
+                            pembahasan: "a = 2, b = 5 - 2 = 3.\nU₁₀ = 2 + (10 - 1) × 3 = 2 + 9(3) = 2 + 27 = 29.",
+                            tips: "Beda b = Uₙ - Uₙ₋₁. Rasio r = Uₙ / Uₙ₋₁.",
+                            kesalahan: "Salah memasukkan nilai n (seringkali lupa dikurangi 1 dalam rumus Un).",
+                            rangkuman: "Aritmetika = Tambah/Kurang konstan; Geometri = Kali/Bagi konstan."
+                        }
+                    }
+                ]
+            },
+            kelasXI: {
+                title: "Kelas XI SMA",
+                badge: "📗 KELAS XI",
+                color: "from-emerald-600 to-teal-600",
+                topics: [
+                    {
+                        id: "xi-matriks",
+                        title: "Matriks & Operasi",
+                        desc: "Ordo, penjumlahan, perkalian matriks, determinan, dan invers.",
+                        icon: "fa-table-cells",
+                        summary: "Baris x Kolom. Perkalian matriks: Baris dikali Kolom.",
+                        content: {
+                            pengertian: "Matriks adalah susunan bilangan dalam bentuk baris dan kolom yang dikurung.",
+                            konsep: "Perkalian matriks A(m×n) dengan B(n×p) menghasilkan matriks C(m×p). Syarat: jumlah kolom A = jumlah baris B.",
+                            rumus: [
+                                { name: "Determinan (2x2)", eq: "det(A) = ad - bc" },
+                                { name: "Invers (2x2)", eq: "A⁻¹ = 1/(ad - bc) × [d -b; -c a]" }
+                            ],
+                            contoh: "Hitung determinan matriks A = [[4, 2], [1, 3]].",
+                            pembahasan: "det(A) = (4 × 3) - (2 × 1) = 12 - 2 = 10.",
+                            tips: "Invers matriks hanya ada jika determinan ≠ 0 (Matriks Non-Singular).",
+                            kesalahan: "Mengalikan elemen bersesuaian saat perkalian dua matr

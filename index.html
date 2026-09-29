@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MATH ADVENTURE SMA - Aplikasi Belajar Matematika SMA Interaktif</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        math: {
+                            gold: '#f59e0b',
+                            green: '#10b981',
+                            red: '#ef4444',
+                            purple: '#8b5cf6',
+                            cyan: '#06b6d4'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .math-font {
+            font-family: 'Fira Code', monospace;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(99, 102, 241, 0.8); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pop-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col pb-20 md:pb-0 transition-colors duration-200">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navTo('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-math-purple flex items-center justify-center text-white font-black text-xl shadow-md">
+                    ∑
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 via-math-purple to-math-cyan bg-clip-text text-transparent">
+                        MATH ADVENTURE
+                    </h1>
+                    <span class="text-[10px] font-bold text-brand-500 uppercase tracking-wider block -mt-1">Edukasi SMA Interaktif</span>
+                </div>
+            </div>
+
+            <!-- Header Quick Stats -->
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <!-- Streak Counter -->
+                <div class="flex items-center space-x-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full text-xs font-bold border border-amber-500/20" title="Streak Belajar">
+                    <i class="fa-solid font-bold fa-fire animate-bounce"></i>
+                    <span id="header-streak">0</span> <span class="hidden sm:inline">Hari</span>
+                </div>
+
+                <!-- XP Badge -->
+                <div class="flex items-center space-x-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-full text-xs font-bold border border-indigo-500/20" title="Total XP">
+                    <i class="fa-solid fa-bolt text-math-gold"></i>
+                    <span id="header-xp">0</span> <span class="hidden sm:inline">XP</span>
+                </div>
+
+                <!-- Level Badge -->
+                <div class="flex items-center space-x-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-500/20" title="Level Pemain">
+                    <i class="fa-solid fa-trophy text-amber-500"></i>
+                    <span>Lvl <span id="header-level">1</span></span>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <button onclick="app.toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main id="app-content" class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 overflow-x-hidden">
+        <!-- Dynamic Views will be injected here via JavaScript -->
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 md:hidden">
+        <div class="flex justify-around items-center max-w-md mx-auto">
+            <button onclick="app.navTo('home')" id="nav-btn-home" class="nav-item flex flex-col items-center py-1 px-3 text-brand-600 dark:text-brand-400 font-medium text-xs">
+                <i class="fa-solid fa-house text-lg mb-0.5"></i>
+                <span>Beranda</span>
+            </button>
+            <button onclick="app.navTo('belajar')" id="nav-btn-belajar" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-book-open text-lg mb-0.5"></i>
+                <span>Belajar</span>
+            </button>
+            <button onclick="app.navTo('latihan-select')" id="nav-btn-game" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-gamepad text-lg mb-0.5"></i>
+                <span>Latihan</span>
+            </button>
+            <button onclick="app.navTo('rumus')" id="nav-btn-rumus" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-square-root-variable text-lg mb-0.5"></i>
+                <span>Rumus</span>
+            </button>
+            <button onclick="app.navTo('profil')" id="nav-btn-profil" class="nav-item flex flex-col items-center py-1 px-3 text-slate-500 dark:text-slate-400 text-xs">
+                <i class="fa-solid fa-user text-lg mb-0.5"></i>
+                <span>Profil</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Reusable Modal overlay -->
+    <div id="app-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden animate-pop">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative">
+            <button onclick="app.closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-content">
+                <!-- Modal content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Sound Synthesizer (100% offline, zero external audio dependency)
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+            playTone(freq, type = 'sine', duration = 0.15, vol = 0.1) {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+            click() { this.playTone(600, 'sine', 0.05, 0.05); }
+            correct() { 
+                this.playTone(523.25, 'triangle', 0.1, 0.1); 
+                setTimeout(() => this.playTone(659.25, 'triangle', 0.1, 0.1), 80);
+                setTimeout(() => this.playTone(783.99, 'triangle', 0.2, 0.1), 160);
+            }
+            wrong() { 
+                this.playTone(220, 'sawtooth', 0.15, 0.1); 
+                setTimeout(() => this.playTone(180, 'sawtooth', 0.25, 0.1), 120);
+            }
+            fanfare() {
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    setTimeout(() => this.playTone(f, 'sine', 0.25, 0.12), i * 100);
+                });
+            }
+        }
+        const sfx = new SoundFX();
+
+        // Comprehensive Curriculum Database for SMA Math (X, XI, XII)
+        const CURRICULUM = {
+            kelasX: {
+                title: "Kelas X SMA",
+                badge: "📘 KELAS X",
+                color: "from-blue-600 to-indigo-600",
+                topics: [
+                    {
+                        id: "x-eksponen-log",
+                        title: "Eksponen & Logaritma",
+                        desc: "Sifat-sifat pangkat, bentuk akar, dan operasi logaritma.",
+                        icon: "fa-superscript",
+                        summary: "Eksponen adalah perkalian berulang. Logaritma adalah kebalikan (invers) dari eksponen.",
+                        content: {
+                            pengertian: "Eksponen menyatakan perkalian berulang dari suatu bilangan dasar sebanyak pangkatan tersebut. Logaritma menentukan besar pangkat dari suatu bilangan basis.",
+                            konsep: "1. Jika a^b = c, maka ᵃlog c = b.\n2. Pangkat negatif: a⁻ⁿ = 1/(aⁿ).\n3. Pangkat pecahan: a^(m/n) = ⁿ√(aᵐ).",
+                            rumus: [
+                                { name: "Perkalian Eksponen", eq: "aᵐ × aⁿ = aᵐ⁺ⁿ" },
+                                { name: "Pembagian Eksponen", eq: "aᵐ ÷ aⁿ = aᵐ⁻ⁿ" },
+                                { name: "Sifat Logaritma", eq: "ᵃlog(b × c) = ᵃlog b + ᵃlog c" },
+                                { name: "Sifat Basis Logaritma", eq: "ᵃlog(b/c) = ᵃlog b - ᵃlog c" },
+                                { name: "Pangkat Logaritma", eq: "ᵃlog(bⁿ) = n × ᵃlog b" }
+                            ],
+                            contoh: "Sederhanakan 2³ × 2⁴ ÷ 2².",
+                            pembahasan: "Langkah 1: Gunakan sifat perkalian: 2³⁺⁴ = 2⁷.\nLangkah 2: Gunakan sifat pembagian: 2⁷⁻² = 2⁵ = 32.",
+                            tips: "Pastikan basis (bilangan pokok) sudah sama sebelum menjumlahkan/mengurangkan pangkat!",
+                            kesalahan: "Mengalikan basis saat perpangkatan, contoh: 2³ × 2⁴ disalahartikan menjadi 4⁷ (seharusnya tetap basis 2, yaitu 2⁷).",
+                            rangkuman: "Ingat: Sifat pangkat hanya berlaku pada basis yang identik!"
+                        },
+                        hasInteractive: true,
+                        interactiveType: "exponent"
+                    },
+                    {
+                        id: "x-persamaan-kuadrat",
+                        title: "Persamaan & Pertidaksamaan Kuadrat",
+                        desc: "Akar persamaan kuadrat, rumus ABC, diskriminan & grafik parabola.",
+                        icon: "fa-chart-line",
+                        summary: "Bentuk umum ax² + bx + c = 0. Memiliki nilai Diskriminan D = b² - 4ac.",
+                        content: {
+                            pengertian: "Persamaan kuadrat adalah persamaan polinomial berderajat dua dengan bentuk umum ax² + bx + c = 0 (a ≠ 0).",
+                            konsep: "Akar-akar persamaan kuadrat dapat dicari dengan faktorisasi, melengkapkan kuadrat sempurna, atau rumus ABC.",
+                            rumus: [
+                                { name: "Rumus ABC", eq: "x₁,₂ = (-b ± √(b² - 4ac)) / (2a)" },
+                                { name: "Diskriminan", eq: "D = b² - 4ac" },
+                                { name: "Jumlah Akar", eq: "x₁ + x₂ = -b/a" },
+                                { name: "Hasil Kali Akar", eq: "x₁ × x₂ = c/a" }
+                            ],
+                            contoh: "Tentukan akar-akar dari x² - 5x + 6 = 0.",
+                            pembahasan: "Cari dua bilangan jika dikali hasilnya +6 dan dijumlahkan -5.\nBilangan tersebut adalah -2 dan -3.\n(x - 2)(x - 3) = 0, maka x₁ = 2 dan x₂ = 3.",
+                            tips: "Periksa nilai D: Jika D > 0 (2 akar real), D = 0 (1 akar kembar), D < 0 (akar imajiner).",
+                            kesalahan: "Lupa membagi dengan 2a pada rumus ABC atau salah tanda negatif pada -b.",
+                            rangkuman: "Diskriminan menentukan jenis dan banyaknya titik potong grafik terhadap sumbu-X."
+                        },
+                        hasInteractive: true,
+                        interactiveType: "quadratic"
+                    },
+                    {
+                        id: "x-trigonometri-dasar",
+                        title: "Trigonometri Dasar",
+                        desc: "Sinus, Kosinus, Tangen pada segitiga siku-siku & sudut istimewa.",
+                        icon: "fa-shapes",
+                        summary: "Sin = Demi, Cos = Sami, Tan = Desa.",
+                        content: {
+                            pengertian: "Trigonometri mempelajari hubungan antara panjang sisi dan besar sudut dalam segitiga.",
+                            konsep: "Sisi Depan (de), Sisi Samping (sa), Sisi Miring (mi).\nSin θ = de/mi, Cos θ = sa/mi, Tan θ = de/sa.",
+                            rumus: [
+                                { name: "Sinus", eq: "sin θ = Depan / Miring" },
+                                { name: "Kosinus", eq: "cos θ = Samping / Miring" },
+                                { name: "Tangen", eq: "tan θ = Depan / Samping = sin θ / cos θ" },
+                                { name: "Identitas Utama", eq: "sin²θ + cos²θ = 1" }
+                            ],
+                            contoh: "Jika segitiga siku-siku memiliki depan=3, samping=4, tentukan miring dan sin θ.",
+                            pembahasan: "Miring = √(3² + 4²) = √(9+16) = √25 = 5.\nsin θ = 3 / 5 = 0.6.",
+                            tips: "Hafalkan nilai sudut istimewa 0°, 30°, 45°, 60°, 90° dengan trik pola √0/2, √1/2, √2/2, √3/2, √4/2.",
+                            kesalahan: "Tertukar antara sisi depan dan sisi samping saat sudut acuan dipindahkan.",
+                            rangkuman: "Sisi miring selalu terletak tepat di depan sudut siku-siku (90°)."
+                        },
+                        hasInteractive: true,
+                        interactiveType: "trigonometry"
+                    },
+                    {
+                        id: "x-barisan-deret",
+                        title: "Barisan & Deret",
+                        desc: "Barisan aritmetika (Beda konsisten) & geometri (Rasio konsisten).",
+                        icon: "fa-arrow-trend-up",
+                        summary: "Aritmetika memiliki Beda (b), Geometri memiliki Rasio (r).",
+                        content: {
+                            pengertian: "Barisan adalah urutan bilangan ber pola, sedangkan deret adalah jumlah dari suku-suku barisan tersebut.",
+                            konsep: "Aritmetika menggunakan penjumlahan selisih tetap (b). Geometri menggunakan perkalian faktor tetap (r).",
+                            rumus: [
+                                { name: "Suku ke-n Aritmetika", eq: "Un = a + (n - 1)b" },
+                                { name: "Jumlah n Suku Aritmetika", eq: "Sn = n/2 × (2a + (n - 1)b)" },
+                                { name: "Suku ke-n Geometri", eq: "Un = a × rⁿ⁻¹" }
+                            ],
+                            contoh: "Diketahui barisan 2, 5, 8, 11... Cari suku ke-10.",
+                            pembahasan: "a = 2, b = 5 - 2 = 3.\nU₁₀ = 2 + (10 - 1) × 3 = 2 + 9(3) = 2 + 27 = 29.",
+                            tips: "Beda b = Uₙ - Uₙ₋₁. Rasio r = Uₙ / Uₙ₋₁.",
+                            kesalahan: "Salah memasukkan nilai n (seringkali lupa dikurangi 1 dalam rumus Un).",
+                            rangkuman: "Aritmetika = Tambah/Kurang konstan; Geometri = Kali/Bagi konstan."
+                        }
+                    }
+                ]
+            },
+            kelasXI: {
+                title: "Kelas XI SMA",
+                badge: "📗 KELAS XI",
+                color: "from-emerald-600 to-teal-600",
+                topics: [
+                    {
+                        id: "xi-matriks",
+                        title: "Matriks & Operasi",
+                        desc: "Ordo, penjumlahan, perkalian matriks, determinan, dan invers.",
+                        icon: "fa-table-cells",
+                        summary: "Baris x Kolom. Perkalian matriks: Baris dikali Kolom.",
+                        content: {
+                            pengertian: "Matriks adalah susunan bilangan dalam bentuk baris dan kolom yang dikurung.",
+                            konsep: "Perkalian matriks A(m×n) dengan B(n×p) menghasilkan matriks C(m×p). Syarat: jumlah kolom A = jumlah baris B.",
+                            rumus: [
+                                { name: "Determinan (2x2)", eq: "det(A) = ad - bc" },
+                                { name: "Invers (2x2)", eq: "A⁻¹ = 1/(ad - bc) × [d -b; -c a]" }
+                            ],
+                            contoh: "Hitung determinan matriks A = [[4, 2], [1, 3]].",
+                            pembahasan: "det(A) = (4 × 3) - (2 × 1) = 12 - 2 = 10.",
+                            tips: "Invers matriks hanya ada jika determinan ≠ 0 (Matriks Non-Singular).",
+                            kesalahan: "Mengalikan elemen bersesuaian saat perkalian dua matriks (seharusnya aturan baris × kolom).",
+                            rangkuman: "Invers membalikkan transformasi matriks asal."
+                        }
+                    },
+                    {
+                        id: "xi-turunan",
+                        title: "Turunan Fungsi Aljabar",
+                        desc: "Konsep limit gradien, aturan pangkat, aturan perkalian & pembagian.",
+                        icon: "fa-chart-area",
+                        summary: "f'(x) = n · a · xⁿ⁻¹. Laju perubahan seketika.",
+                        content: {
+                            pengertian: "Turunan (diferensial) mengukur tingkat perubahan suatu fungsi terhadap variabelnya.",
+                            konsep: "Turunan fungsi f(x) dinotasikan dengan f'(x) atau dy/dx.",
+                            rumus: [
+                                { name: "Aturan Pangkat", eq: "d/dx (a·xⁿ) = n·a·xⁿ⁻¹" },
+                                { name: "Aturan Perkalian", eq: "(u · v)' = u'v + uv'" },
+                                { name: "Aturan Pembagian", eq: "(u / v)' = (u'v - uv') / v²" }
+                            ],
+                            contoh: "Turunan dari f(x) = 3x⁴ - 2x² + 5.",
+                            pembahasan: "f'(x) = 4(3)x⁴⁻¹ - 2(2)x²⁻¹ + 0 = 12x³ - 4x.",
+                            tips: "Turunan dari sebarang konstanta c adalah 0.",
+                            kesalahan: "Lupa mengalikan dengan turunan fungsi dalam saat menggunakan aturan rantai.",
+                            rangkuman: "Turunan berguna menentukan gradien garis singgung & nilai maksimum/minimum."
+                        }
+                    },
+                    {
+                        id: "xi-transformasi",
+                        title: "Transformasi Geometri",
+                        desc: "Translasi, Refleksi, Rotasi, dan Dilatasi titik atau garis.",
+                        icon: "fa-vector-square",
+                        summary: "Pergeseran, Pencerminan, Perputaran, dan Perkalian skala.",
+                        content: {
+                            pengertian: "Transformasi geometri adalah pemindahan titik atau bangun pada bidang koordinat.",
+                            konsep: "Setiap transformasi dapat diwakili oleh operasi matriks koordinat (x', y').",
+                            rumus: [
+                                { name: "Translasi (a, b)", eq: "(x', y') = (x + a, y + b)" },
+                                { name: "Refleksi Sumbu X", eq: "(x', y') = (x, -y)" },
+                                { name: "Dilatasi pusat (0,0) skala k", eq: "(x', y') = (k·x, k·y)" }
+                            ],
+                            contoh: "Titik P(2, 3) ditranslasikan oleh T(4, -1). Tentukan P'.",
+                            pembahasan: "P' = (2 + 4, 3 + (-1)) = (6, 2).",
+                            tips: "Gunakan matriks transformasi untuk memproses rotasi sudut sembarang.",
+                            kesalahan: "Lupa mengubah tanda positif/negatif pada rotasi searah vs berlawanan jarum jam.",
+                            rangkuman: "Dilatasi mengubah ukuran bangun, sedangkan translasi, refleksi, dan rotasi mempertahankan ukuran (isometri)."
+                        },
+                        hasInteractive: true,
+                        interactiveType: "transform"
+                    }
+                ]
+            },
+            kelasXII: {
+                title: "Kelas XII SMA",
+                badge: "📕 KELAS XII",
+                color: "from-purple-600 to-pink-600",
+                topics: [
+                    {
+                        id: "xii-integral",
+                        title: "Integral Tak Tentu & Tentu",
+                        desc: "Antiturunan, rumus dasar integral aljabar, dan luas daerah kurva.",
+                        icon: "fa-infinity",
+                        summary: "∫ xⁿ dx = (1/(n+1)) xⁿ⁺¹ + C. Kebalikan dari turunan.",
+                        content: {
+                            pengertian: "Integral merupakan kebalikan dari diferensial (antiturunan) dan digunakan untuk menghitung akumulasi luas.",
+                            konsep: "Integral tak tentu menghasilkan fungsi + C. Integral tentu memiliki batas atas dan bawah sehingga menghasilkan nilai pasti.",
+                            rumus: [
+                                { name: "Integral Tak Tentu", eq: "∫ a·xⁿ dx = (a / (n+1)) xⁿ⁺¹ + C" },
+                                { name: "Integral Tentu", eq: "∫ₐᵇ f(x) dx = F(b) - F(a)" }
+                            ],
+                            contoh: "Hitung ∫ (3x² + 2x) dx.",
+                            pembahasan: "= (3/3)x³ + (2/2)x² + C = x³ + x² + C.",
+                            tips: "Jangan pernah lupa menambahkan konstanta + C pada integral tak tentu!",
+                            kesalahan: "Membagi dengan n alih-alih (n+1) saat menaikkan derajat pangkat.",
+                            rangkuman: "Integral tentu luas daerah dibatasi kurva f(x) terhadap sumbu X dari x=a hingga x=b."
+                        }
+                    },
+                    {
+                        id: "xii-vektor",
+                        title: "Vektor Dimensi 2 & 3",
+                        desc: "Operasi vektor, panjang vektor, dot product, dan sudut dua vektor.",
+                        icon: "fa-arrows-up-down-left-right",
+                        summary: "Vektor memiliki besar (panjang) dan arah.",
+                        content: {
+                            pengertian: "Vektor adalah besaran yang memiliki nilai dan arah, digambarkan dengan panah.",
+                            konsep: "Perkalian titik (Dot Product): a · b = |a||b| cos θ.",
+                            rumus: [
+                                { name: "Panjang Vektor v(x,y,z)", eq: "|v| = √(x² + y² + z²)" },
+                                { name: "Dot Product", eq: "a · b = a₁b₁ + a₂b₂ + a₃b₃" },
+                                { name: "Sudut θ", eq: "cos θ = (a · b) / (|a| × |b|)" }
+                            ],
+                            contoh: "Jika a = (3, 4), hitung panjang vektor |a|.",
+                            pembahasan: "|a| = √(3² + 4²) = √(9 + 16) = √25 = 5.",
+                            tips: "Jika dua vektor saling tegak lurus (siku-siku), perkalian titiknya a · b = 0.",
+                            kesalahan: "Tertukar antara hasil perkalian skalar (dot product = angka) dengan perkalian vektor.",
+                            rangkuman: "Dot product mengukur sejauh mana dua vektor menunjuk ke arah yang sama."
+                        }
+                    },
+                    {
+                        id: "xii-kombinatorika",
+                        title: "Kombinatorika & Peluang",
+                        desc: "Aturan pencacahan, Permutasi (memperhatikan urutan), Kombinasi.",
+                        icon: "fa-dice",
+                        summary: "Permutasi (AB ≠ BA), Kombinasi (AB = BA).",
+                        content: {
+                            pengertian: "Kombinatorika mempelajari teknik menghitung banyaknya susunan atau kemungkinan yang terjadi.",
+                            konsep: "Faktorial: n! = n × (n-1) × ... × 1. Permutasi memperhatikan urutan, Kombinasi tidak memperhatikan urutan.",
+                            rumus: [
+                                { name: "Permutasi", eq: "nPr = n! / (n - r)!" },
+                                { name: "Kombinasi", eq: "nCr = n! / (r! × (n - r)!)" },
+                                { name: "Peluang Kejadian", eq: "P(A) = n(A) / n(S)" }
+                            ],
+                            contoh: "Berapa cara memilih 2 pengurus dari 4 siswa tanpa memperhatikan posisi?",
+                            pembahasan: "Gunakan Kombinasi ₄C₂ = 4! / (2! × 2!) = (4 × 3) / (2 × 1) = 6 cara.",
+                            tips: "Kata kunci: 'memilih tim / kelompok' -> Kombinasi. 'peringkat / posisi / susunan' -> Permutasi.",
+                            kesalahan: "Menggunakan permutasi untuk masalah acak yang urutannya tidak penting.",
+                            rangkuman: "Peluang selalu bernilai antara 0 (mustahil) hingga 1 (pasti)."
+                        }
+                    }
+                ]
+            }
+        };
+
+        // Comprehensive Bank of Practice & Challenge Questions
+        const QUESTION_BANK = [
+            {
+                id: "q1",
+                topicId: "x-eksponen-log",
+                classId: "kelasX",
+                question: "Nilai dari (2³ × 2⁵) ÷ 2⁴ adalah...",
+                options: ["8", "16", "32", "64"],
+                correct: 1,
+                explanation: "Gunakan sifat eksponen:\n2³⁺⁵⁻⁴ = 2⁴ = 16.",
+                difficulty: "easy"
+            },
+            {
+                id: "q2",
+                topicId: "x-eksponen-log",
+                classId: "kelasX",
+                question: "Jika ²log 8 = x, maka nilai x adalah...",
+                options: ["2", "3", "4", "8"],
+                correct: 1,
+                explanation: "²log 8 = ²log(2³) = 3 × ²log 2 = 3 × 1 = 3.",
+                difficulty: "easy"
+            },
+            {
+                id: "q3",
+                topicId: "x-persamaan-kuadrat",
+                classId: "kelasX",
+                question: "Akar-akar dari persamaan kuadrat x² - 7x + 12 = 0 adalah...",
+                options: ["x = -3 atau x = -4", "x = 3 atau x = 4", "x = 2 atau x = 6", "x = 1 atau x = 12"],
+                correct: 1,
+                explanation: "Faktorkan x² - 7x + 12 = (x - 3)(x - 4) = 0. Maka x = 3 atau x = 4.",
+                difficulty: "medium"
+            },
+            {
+                id: "q4",
+                topicId: "x-persamaan-kuadrat",
+                classId: "kelasX",
+                question: "Nilai diskriminan (D) dari persamaan 2x² - 4x + 3 = 0 adalah...",
+                options: ["-8", "-4", "8", "4"],
+                correct: 0,
+                explanation: "D = b² - 4ac = (-4)² - 4(2)(3) = 16 - 24 = -8. Karena D < 0, tidak memiliki akar real.",
+                difficulty: "medium"
+            },
+            {
+                id: "q5",
+                topicId: "x-trigonometri-dasar",
+                classId: "kelasX",
+                question: "Pada segitiga siku-siku, jika sisi depan = 6 dan sisi miring = 10, berapakah nilai sin θ?",
+                options: ["0.5", "0.6", "0.75", "0.8"],
+                correct: 1,
+                explanation: "sin θ = Depan / Miring = 6 / 10 = 0.6.",
+                difficulty: "easy"
+            },
+            {
+                id: "q6",
+                topicId: "x-barisan-deret",
+                classId: "kelasX",
+                question: "Suku ke-15 dari barisan aritmetika 5, 9, 13, 17... adalah...",
+                options: ["57", "61", "65", "69"],
+                correct: 1,
+                explanation: "a = 5, b = 4.\nU₁₅ = a + (15-1)b = 5 + 14(4) = 5 + 56 = 61.",
+                difficulty: "medium"
+            },
+            {
+                id: "q7",
+                topicId: "xi-matriks",
+                classId: "kelasXI",
+                question: "Determinan dari matriks [[3, 2], [1, 4]] adalah...",
+                options: ["10", "12", "14", "8"],
+                correct: 0,
+                explanation: "det = ad - bc = (3 × 4) - (2 × 1) = 12 - 2 = 10.",
+                difficulty: "easy"
+            },
+            {
+                id: "q8",
+                topicId: "xi-turunan",
+                classId: "kelasXI",
+                question: "Turunan pertama dari f(x) = 4x³ - 5x² + 7x - 9 adalah f'(x) = ...",
+                options: ["12x² - 10x + 7", "12x³ - 10x² + 7", "4x² - 5x + 7", "12x² - 5x + 7"],
+                correct: 0,
+                explanation: "f'(x) = 3(4)x² - 2(5)x + 7 - 0 = 12x² - 10x + 7.",
+                difficulty: "medium"
+            },
+            {
+                id: "q9",
+                topicId: "xi-transformasi",
+                classId: "kelasXI",
+                question: "Hasil bayangan titik A(3, -2) jika ditranslasikan oleh T(-1, 5) adalah...",
+                options: ["A'(2, 3)", "A'(4, 3)", "A'(2, -7)", "A'(-2, -3)"],
+                correct: 0,
+                explanation: "A' = (3 + (-1), -2 + 5) = (2, 3).",
+                difficulty: "easy"
+            },
+            {
+                id: "q10",
+                topicId: "xii-integral",
+                classId: "kelasXII",
+                question: "Hasil dari ∫ (6x² - 4x + 3) dx adalah...",
+                options: ["2x³ - 2x² + 3x + C", "3x³ - 2x² + 3x + C", "2x³ - 4x² + 3x + C", "6x³ - 2x² + C"],
+                correct: 0,
+                explanation: "= (6/3)x³ - (4/2)x² + 3x + C = 2x³ - 2x² + 3x + C.",
+                difficulty: "medium"
+            },
+            {
+                id: "q11",
+                topicId: "xii-vektor",
+                classId: "kelasXII",
+                question: "Panjang vektor u = (6, 8) adalah...",
+                options: ["10", "12", "14", "100"],
+                correct: 0,
+                explanation: "|u| = √(6² + 8²) = √(36 + 64) = √100 = 10.",
+                difficulty: "easy"
+            },
+            {
+                id: "q12",
+                topicId: "xii-kombinatorika",
+                classId: "kelasXII",
+                question: "Banyaknya cara menyusun 3 buku berbeda di atas rak adalah...",
+                options: ["3", "6", "9", "12"],
+                correct: 1,
+                explanation: "Gunakan permutasi 3! = 3 × 2 × 1 = 6 cara.",
+                difficulty: "easy"
+            }
+        ];
+
+        const ACHIEVEMENTS = [
+            { id: "first_step", title: "Langkah Pertama", desc: "Menyelesaikan 1 soal latihan", icon: "fa-shoe-prints", color: "text-blue-500" },
+            { id: "streak_3", title: "Konsisten!", desc: "Mencapai 3 hari streak belajar", icon: "fa-fire", color: "text-amber-500" },
+            { id: "combo_master", title: "Combo Master", desc: "Mencapai Combo x5 saat latihan", icon: "fa-bolt", color: "text-purple-500" },
+            { id: "bookworm", title: "Kutu Buku", desc: "Membaca 5 materi berbeda", icon: "fa-book-bookmark", color: "text-emerald-500" },
+            { id: "calculator_pro", title: "Hitung Cepat", desc: "Menggunakan kalkulator interaktif", icon: "fa-calculator", color: "text-cyan-500" },
+            { id: "math_master", title: "Master Matematika", desc: "Mencapai Level 3", icon: "fa-crown", color: "text-yellow-500" }
+        ];
+
+        class MathAdventureApp {
+            constructor() {
+                this.state = {
+                    name: "Petualang Math",
+                    xp: 0,
+                    level: 1,
+                    streak: 1,
+                    accuracy: 100,
+                    totalAnswered: 0,
+                    correctAnswered: 0,
+                    bookmarks: [],
+                    readMaterials: [],
+                    unlockedAchievements: ["first_step"],
+                    lastMaterial: { id: "x-persamaan-kuadrat", classId: "kelasX", title: "Persamaan Kuadrat" },
+                    settings: { dark: true, sound: true }
+                };
+                this.currentQuiz = null;
+                this.quizTimer = null;
+            }
+
+            init() {
+                this.loadState();
+                this.applyTheme();
+                this.updateHeaderStats();
+                this.navTo('home');
+            }
+
+            loadState() {
+                const saved = localStorage.getItem('math_adventure_sma_state');
+                if (saved) {
+                    try {
+                        this.state = { ...this.state, ...JSON.parse(saved) };
+                    } catch(e) {}
+                }
+            }
+
+            saveState() {
+                localStorage.setItem('math_adventure_sma_state', JSON.stringify(this.state));
+                this.updateHeaderStats();
+            }
+
+            applyTheme() {
+                if (this.state.settings.dark) {
+                    document.documentElement.classList.add('dark');
+                    document.getElementById('theme-icon').className = 'fa-solid fa-sun text-amber-400';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.getElementById('theme-icon').className = 'fa-solid fa-moon text-slate-600';
+                }
+            }
+
+            toggleTheme() {
+                sfx.click();
+                this.state.settings.dark = !this.state.settings.dark;
+                this.applyTheme();
+                this.saveState();
+            }
+
+            addXP(amount) {
+                this.state.xp += amount;
+                const oldLevel = this.state.level;
+                this.state.level = Math.floor(this.state.xp / 300) + 1;
+                
+                if (this.state.level > oldLevel) {
+                    sfx.fanfare();
+                    this.showModal(`
+                        <div class="text-center py-4">
+                            <div class="w-20 h-20 bg-amber-500/20 text-amber-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-3 animate-bounce">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <h2 class="text-2xl font-black text-slate-800 dark:text-white">LEVEL UP!</h2>
+                            <p class="text-slate-600 dark:text-slate-300 mt-1">Selamat! Kamu naik ke <span class="font-bold text-amber-500">Level ${this.state.level}</span>!</p>
+                            <button onclick="app.closeModal()" class="mt-5 w-full py-3 bg-brand-600 text-white font-bold rounded-xl shadow-lg hover:bg-brand-700">Lanjutkan Petualangan</button>
+                        </div>
+                    `);
+                    this.checkAchievement("math_master");
+                }
+                this.saveState();
+            }
+
+            checkAchievement(achId) {
+                if (!this.state.unlockedAchievements.includes(achId)) {
+                    this.state.unlockedAchievements.push(achId);
+                    this.saveState();
+                }
+            }
+
+            updateHeaderStats() {
+                document.getElementById('header-streak').innerText = this.state.streak;
+                document.getElementById('header-xp').innerText = this.state.xp;
+                document.getElementById('header-level').innerText = this.state.level;
+            }
+
+            navTo(viewName, params = {}) {
+                sfx.click();
+                
+                // Update bottom nav active state
+                document.querySelectorAll('.nav-item').forEach(btn => {
+                    btn.classList.remove('text-brand-600', 'dark:text-brand-400');
+                    btn.classList.add('text-slate-500', 'dark:text-slate-400');
+                });
+                const activeNav = document.getElementById(`nav-btn-${viewName}`);
+                if (activeNav) {
+                    activeNav.classList.remove('text-slate-500', 'dark:text-slate-400');
+                    activeNav.classList.add('text-brand-600', 'dark:text-brand-400');
+                }
+
+                const container = document.getElementById('app-content');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                switch(viewName) {
+                    case 'home':
+                        container.innerHTML = this.renderHomeView();
+                        break;
+                    case 'belajar':
+                        container.innerHTML = this.renderBelajarView(params.classId);
+                        break;
+                    case 'topic-detail':
+                        container.innerHTML = this.renderTopicDetailView(params.topicId, params.classId);
+                        this.initInteractiveWidget(params.topicId);
+                        break;
+                    case 'latihan-select':
+                        container.innerHTML = this.renderLatihanSelectView();
+                        break;
+                    case 'quiz':
+                        container.innerHTML = this.renderQuizView(params.mode, params.topicId);
+                        this.startQuizSession(params.mode, params.topicId);
+                        break;
+                    case 'rumus':
+                        container.innerHTML = this.renderRumusView();
+                        break;
+                    case 'kalkulator':
+                        container.innerHTML = this.renderKalkulatorView();
+                        this.initCalculatorLogic();
+                        break;
+                    case 'progres':
+                        container.innerHTML = this.renderProgresView();
+                        break;
+                    case 'profil':
+                        container.innerHTML = this.renderProfilView();
+                        break;
+                    default:
+                        container.innerHTML = this.renderHomeView();
+                }
+            }
+
+            showModal(htmlContent) {
+                document.getElementById('modal-content').innerHTML = htmlContent;
+                document.getElementById('app-modal').classList.remove('hidden');
+            }
+
+            closeModal() {
+                sfx.click();
+                document.getElementById('app-modal').classList.add('hidden');
+            }
+
+            renderHomeView() {
+                const lastMat = this.state.lastMaterial;
+                return `
+                    <div class="space-y-6 animate-pop">
+                        <!-- Welcome Banner -->
+                        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-600 via-indigo-600 to-math-purple p-6 md:p-8 text-white shadow-xl">
+                            <div class="absolute -right-10 -bottom-10 opacity-15 text-9xl font-black select-none">
+                                ∫
+                            </div>
+                            <div class="relative z-10 max-w-xl">
+                                <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold mb-3">
+                                    👋 Selamat Datang, ${this.state.name}!
+                                </span>
+                                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Kuasai Matematika SMA dengan Cara Seru!</h2>
+                                <p class="mt-2 text-indigo-100 text-sm md:text-base">Belajar konsep interaktif, selesaikan soal tantangan, dan capai peringkat tertinggi.</p>
+                                
+                                <div class="mt-6 flex flex-wrap gap-3">
+                                    <button onclick="app.navTo('belajar')" class="px-5 py-2.5 bg-white text-brand-700 font-bold rounded-xl shadow-lg hover:bg-slate-100 transition flex items-center space-x-2">
+                                        <i class="fa-solid fa-play"></i>
+                                        <span>Mulai Belajar</span>
+                                    </button>
+                                    <button onclick="app.navTo('latihan-select')" class="px-5 py-2.5 bg-brand-700/60 backdrop-blur-md border border-white/30 text-white font-bold rounded-xl hover:bg-brand-700 transition flex items-center space-x-2">
+                                        <i class="fa-solid fa-bolt text-math-gold"></i>
+                                        <span>Tantangan Cepat</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lanjutkan Belajar Widget -->
+                        <div class="glass-card rounded-2xl p-5 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-bookmark text-brand-500"></i>
+                                    <h3 class="font-bold text-slate-800 dark:text-white">Lanjutkan Belajar</h3>
+                                </div>
+                                <span class="text-xs text-slate-400">Progres Terakhir</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-800/80 p-4 rounded-xl">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100">${lastMat.title}</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Modul Pembelajaran SMA</p>
+                                </div>
+                                <button onclick="app.navTo('topic-detail', {topicId: '${lastMat.id}', classId: '${lastMat.classId}'})" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow transition">
+                                    Lanjutkan
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Class Selection Cards -->
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center space-x-2">
+                                <i class="fa-solid fa-graduation-cap text-brand-500"></i>
+                                <span>Pilih Kelas Kamu</span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Kelas X -->
+                                <div onclick="app.navTo('belajar', {classId: 'kelasX'})" class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-blue-500 group">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <span class="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full">📘 KELAS X</span>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-slate-800 dark:text-white text-lg">Matematika Kelas X</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Eksponen, Logaritma, Persamaan Kuadrat & Trigonometri Dasar.</p>
+                                </div>
+
+                                <!-- Kelas XI -->
+                                <div onclick="app.navTo('belajar', {classId: 'kelasXI'})" class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-emerald-500 group">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <span class="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full">📗 KELAS XI</span>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-slate-800 dark:text-white text-lg">Matematika Kelas XI</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Matriks, Turunan Aljabar & Transformasi Geometri.</p>
+                                </div>
+
+                                <!-- Kelas XII -->
+                                <div onclick="app.navTo('belajar', {classId: 'kelasXII'})" class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-purple-500 group">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <span class="px-3 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-bold rounded-full">📕 KELAS XII</span>
+                                        <i class="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-slate-800 dark:text-white text-lg">Matematika Kelas XII</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Integral Tentu, Vektor & Kombinatorika Peluang.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Utility Menu Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <button onclick="app.navTo('rumus')" class="glass-card p-4 rounded-2xl flex items-center space-x-3 text-left hover:border-brand-500 transition">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-lg font-bold">
+                                    <i class="fa-solid fa-square-root-variable"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">Bank Rumus</div>
+                                    <div class="text-[11px] text-slate-400">Ringkasan Cepat</div>
+                                </div>
+                            </button>
+
+                            <button onclick="app.navTo('kalkulator')" class="glass-card p-4 rounded-2xl flex items-center space-x-3 text-left hover:border-brand-500 transition">
+                                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center text-lg font-bold">
+                                    <i class="fa-solid fa-calculator"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">Kalkulator</div>
+                                    <div class="text-[11px] text-slate-400">Alat Bantu Math</div>
+                                </div>
+                            </button>
+
+                            <button onclick="app.navTo('progres')" class="glass-card p-4 rounded-2xl flex items-center space-x-3 text-left hover:border-brand-500 transition">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg font-bold">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">Statistik</div>
+                                    <div class="text-[11px] text-slate-400">Capaian & Level</div>
+                                </div>
+                            </button>
+
+                            <button onclick="app.navTo('profil')" class="glass-card p-4 rounded-2xl flex items-center space-x-3 text-left hover:border-brand-500 transition">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg font-bold">
+                                    <i class="fa-solid fa-gears"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm">Pengaturan</div>
+                                    <div class="text-[11px] text-slate-400">PWA & Offline</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderBelajarView(selectedClassId = 'kelasX') {
+                const selectedClass = CURRICULUM[selectedClassId] || CURRICULUM.kelasX;
+
+                return `
+                    <div class="space-y-6 animate-pop">
+                        <!-- Navigation Header -->
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.navTo('home')" class="text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Kembali ke Beranda</span>
+                            </button>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20">Modul Pembelajaran</span>
+                        </div>
+
+                        <!-- Class Switcher Tabs -->
+                        <div class="flex p-1 bg-slate-200 dark:bg-slate-800 rounded-2xl">
+                            <button onclick="app.navTo('belajar', {classId: 'kelasX'})" class="flex-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition ${selectedClassId === 'kelasX' ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm' : 'text-slate-500'}">
+                                Kelas X
+                            </button>
+                            <button onclick="app.navTo('belajar', {classId: 'kelasXI'})" class="flex-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition ${selectedClassId === 'kelasXI' ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm' : 'text-slate-500'}">
+                                Kelas XI
+                            </button>
+                            <button onclick="app.navTo('belajar', {classId: 'kelasXII'})" class="flex-1 py-2.5 text-xs md:text-sm font-bold rounded-xl transition ${selectedClassId === 'kelasXII' ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm' : 'text-slate-500'}">
+                                Kelas XII
+                            </button>
+                        </div>
+
+                        <!-- Selected Class Header -->
+                        <div class="p-6 rounded-3xl bg-gradient-to-r ${selectedClass.color} text-white shadow-lg">
+                            <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">${selectedClass.badge}</span>
+                            <h2 class="text-2xl font-black mt-2">${selectedClass.title}</h2>
+                            <p class="text-sm text-white/80 mt-1">Pilih topik materi di bawah ini untuk memulai belajar interaktif.</p>
+                        </div>
+
+                        <!-- Material List Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${selectedClass.topics.map(t => `
+                                <div onclick="app.navTo('topic-detail', {topicId: '${t.id}', classId: '${selectedClassId}'})" class="glass-card p-5 rounded-2xl hover:border-brand-500 transition cursor-pointer group flex items-start space-x-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-xl font-bold flex-shrink-0 group-hover:scale-110 transition">
+                                        <i class="fa-solid ${t.icon}"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h4 class="font-extrabold text-slate-800 dark:text-white text-base group-hover:text-brand-500 transition">${t.title}</h4>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">${t.desc}</p>
+                                        <div class="mt-3 flex items-center text-xs font-bold text-brand-500 space-x-1">
+                                            <span>Pelajari Sekarang</span>
+                                            <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderTopicDetailView(topicId, classId) {
+                const classData = CURRICULUM[classId] || CURRICULUM.kelasX;
+                const topic = classData.topics.find(t => t.id === topicId) || classData.topics[0];
+
+                // Update last read material
+                this.state.lastMaterial = { id: topic.id, classId: classId, title: topic.title };
+                if (!this.state.readMaterials.includes(topic.id)) {
+                    this.state.readMaterials.push(topic.id);
+                    this.addXP(50);
+                }
+                this.saveState();
+
+                return `
+                    <div class="space-y-6 animate-pop">
+                        <!-- Navigation Header -->
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.navTo('belajar', {classId: '${classId}'})" class="text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Kembali ke Kategori</span>
+                            </button>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/10 text-brand-500">${classData.title}</span>
+                        </div>
+
+                        <!-- Topic Header Banner -->
+                        <div class="glass-card p-6 rounded-3xl border-l-4 border-brand-500">
+                            <h2 class="text-2xl font-black text-slate-800 dark:text-white flex items-center space-x-3">
+                                <i class="fa-solid ${topic.icon} text-brand-500"></i>
+                                <span>${topic.title}</span>
+                            </h2>
+                            <p class="text-slate-600 dark:text-slate-300 text-sm mt-2">${topic.summary}</p>
+                        </div>
+
+                        <!-- Structured Learning Material Content -->
+                        <div class="space-y-4">
+                            <!-- Pengertian -->
+                            <div class="glass-card p-5 rounded-2xl">
+                                <h3 class="font-extrabold text-base text-slate-800 dark:text-white mb-2 flex items-center space-x-2">
+                                    <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                                    <span>1. Pengertian</span>
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">${topic.content.pengertian}</p>
+                            </div>
+
+                            <!-- Konsep Inti -->
+                            <div class="glass-card p-5 rounded-2xl">
+                                <h3 class="font-extrabold text-base text-slate-800 dark:text-white mb-2 flex items-center space-x-2">
+                                    <i class="fa-solid fa-bullseye text-brand-500"></i>
+                                    <span>2. Konsep Inti</span>
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-300 text-sm whitespace-pre-line leading-relaxed">${topic.content.konsep}</p>
+                            </div>
+
+                            <!-- Rumus Penting -->
+                            <div class="glass-card p-5 rounded-2xl">
+                                <h3 class="font-extrabold text-base text-slate-800 dark:text-white mb-3 flex items-center space-x-2">
+                                    <i class="fa-solid fa-calculator text-math-purple"></i>
+                                    <span>3. Rumus Utama</span>
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    ${topic.content.rumus.map(r => `
+                                        <div class="bg-slate-100 dark:bg-slate-800/80 p-3 rounded-xl">
+                                            <div class="text-xs text-slate-500 font-semibold">${r.name}</div>
+                                            <div class="math-font text-brand-600 dark:text-brand-400 font-bold text-sm md:text-base mt-1">${r.eq}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Interactive Tool Widget (If Applicable) -->
+                            ${topic.hasInteractive ? `
+                                <div class="glass-card p-5 rounded-2xl border-2 border-brand-500/30">
+                                    <h3 class="font-extrabold text-base text-slate-800 dark:text-white mb-3 flex items-center space-x-2">
+                                        <i class="fa-solid fa-sliders text-math-cyan"></i>
+                                        <span>Simulasi Grafik / Visual Interaktif</span>
+                                    </h3>
+                                    <div id="interactive-widget-container" class="space-y-4">
+                                        <!-- Interactive Canvas will be mounted here -->
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Contoh Soal & Pembahasan -->
+                            <div class="glass-card p-5 rounded-2xl">
+                                <h3 class="font-extrabold text-base text-slate-800 dark:text-white mb-2 flex items-center space-x-2">
+                                    <i class="fa-solid fa-magnifying-glass text-emerald-500"></i>
+                                    <span>4. Contoh Soal & Pembahasan</span>
+                                </h3>
+                                <div class="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-amber-800 dark:text-amber-300 text-sm font-semibold mb-3">
+                                    Soal: ${topic.content.contoh}
+                                </div>
+                                <div class="bg-slate-100 dark:bg-slate-800/80 p-4 rounded-xl text-slate-700 dark:text-slate-300 text-sm whitespace-pre-line leading-relaxed">
+                                    ${topic.content.pembahasan}
+                                </div>
+                            </div>
+
+                            <!-- Kesalahan Umum & Tips -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="glass-card p-5 rounded-2xl border-l-4 border-red-500">
+                                    <h4 class="font-bold text-red-600 dark:text-red-400 text-sm mb-1 flex items-center space-x-2">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        <span>Kesalahan Umum</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-600 dark:text-slate-300">${topic.content.kesalahan}</p>
+                                </div>
+                                <div class="glass-card p-5 rounded-2xl border-l-4 border-emerald-500">
+                                    <h4 class="font-bold text-emerald-600 dark:text-emerald-400 text-sm mb-1 flex items-center space-x-2">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                        <span>Tips Cepat</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-600 dark:text-slate-300">${topic.content.tips}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar to Practice -->
+                        <div class="p-6 bg-gradient-to-r from-brand-600 to-indigo-600 rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+                            <div>
+                                <h3 class="font-black text-lg">Siap Menguji Pemahamanmu?</h3>
+                                <p class="text-xs text-indigo-100">Kerjakan latihan soal khusus materi ini untuk mendapatkan XP Tambahan.</p>
+                            </div>
+                            <button onclick="app.navTo('quiz', {mode: 'practice', topicId: '${topic.id}'})" class="w-full md:w-auto px-6 py-3 bg-white text-brand-700 font-extrabold rounded-xl hover:bg-slate-100 transition shadow">
+                                Mulai Latihan Soal
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            initInteractiveWidget(topicId) {
+                const container = document.getElementById('interactive-widget-container');
+                if (!container) return;
+
+                if (topicId === 'x-persamaan-kuadrat') {
+                    container.innerHTML = `
+                        <div class="space-y-3">
+                            <p class="text-xs text-slate-500">Ubah nilai <b>a</b>, <b>b</b>, dan <b>c</b> pada fungsi f(x) = ax² + bx + c:</p>
+                            <div class="flex flex-wrap gap-4 text-xs font-bold">
+                                <div>a: <input type="range" id="param-a" min="-5" max="5" value="1" class="accent-brand-600" oninput="app.drawQuadraticGraph()"> <span id="val-a">1</span></div>
+                                <div>b: <input type="range" id="param-b" min="-10" max="10" value="-2" class="accent-brand-600" oninput="app.drawQuadraticGraph()"> <span id="val-b">-2</span></div>
+                                <div>c: <input type="range" id="param-c" min="-10" max="10" value="-3" class="accent-brand-600" oninput="app.drawQuadraticGraph()"> <span id="val-c">-3</span></div>
+                            </div>
+                            <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden relative">
+                                <canvas id="quad-canvas" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(() => this.drawQuadraticGraph(), 100);
+                } else if (topicId === 'x-trigonometri-dasar') {
+                    container.innerHTML = `
+                        <div class="space-y-3">
+                            <p class="text-xs text-slate-500">Atur Sudut θ untuk melihat perubahan rasio Sin, Cos, Tan:</p>
+                            <div class="text-xs font-bold flex items-center space-x-2">
+                                <span>Sudut θ:</span>
+                                <input type="range" id="param-angle" min="15" max="75" value="30" class="accent-brand-600 w-48" oninput="app.drawTrigTriangle()">
+                                <span id="val-angle" class="text-brand-500 text-sm font-black">30°</span>
+                            </div>
+                            <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden relative">
+                                <canvas id="trig-canvas" class="w-full h-full"></canvas>
+                            </div>
+                            <div id="trig-values" class="grid grid-cols-3 gap-2 text-center text-xs font-mono font-bold">
+                                <!-- Computed Values -->
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(() => this.drawTrigTriangle(), 100);
+                }
+            }
+
+            drawQuadraticGraph() {
+                const canvas = document.getElementById('quad-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                const a = parseFloat(document.getElementById('param-a').value);
+                const b = parseFloat(document.getElementById('param-b').value);
+                const c = parseFloat(document.getElementById('param-c').value);
+
+                document.getElementById('val-a').innerText = a;
+                document.getElementById('val-b').innerText = b;
+                document.getElementById('val-c').innerText = c;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw Grid & Axes
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
+                const scale = 15;
+
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy);
+                ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height);
+                ctx.stroke();
+
+                // Draw Parabola Curve
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+
+                for (let px = -cx; px <= cx; px += 1) {
+                    const x = px / scale;
+                    const y = a * x * x + b * x + c;
+                    const py = cy - y * scale;
+                    if (px === -cx) ctx.moveTo(cx + px, py);
+                    else ctx.lineTo(cx + px, py);
+                }
+                ctx.stroke();
+            }
+
+            drawTrigTriangle() {
+                const canvas = document.getElementById('trig-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                const angleDeg = parseFloat(document.getElementById('param-angle').value);
+                document.getElementById('val-angle').innerText = angleDeg + '°';
+
+                const rad = angleDeg * (Math.PI / 180);
+                const sinVal = Math.sin(rad);
+                const cosVal = Math.cos(rad);
+                const tanVal = Math.tan(rad);
+
+                document.getElementById('trig-values').innerHTML = `
+                    <div class="bg-indigo-500/10 p-2 rounded-lg text-indigo-400">sin(${angleDeg}°) = ${sinVal.toFixed(2)}</div>
+                    <div class="bg-emerald-500/10 p-2 rounded-lg text-emerald-400">cos(${angleDeg}°) = ${cosVal.toFixed(2)}</div>
+                    <div class="bg-amber-500/10 p-2 rounded-lg text-amber-400">tan(${angleDeg}°) = ${tanVal.toFixed(2)}</div>
+                `;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw Right Triangle
+                const startX = 50;
+                const startY = canvas.height - 30;
+                const baseLen = 160;
+                const heightLen = baseLen * Math.tan(rad);
+
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(startX + baseLen, startY);
+                ctx.lineTo(startX + baseLen, startY - heightLen);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Labels
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '12px Inter';
+                ctx.fillText(`θ = ${angleDeg}°`, startX + 25, startY - 10);
+                ctx.fillText(`Depan`, startX + baseLen + 10, startY - heightLen/2);
+                ctx.fillText(`Samping`, startX + baseLen/2 - 20, startY + 20);
+            }
+
+            renderLatihanSelectView() {
+                return `
+                    <div class="space-y-6 animate-pop">
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.navTo('home')" class="text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Beranda</span>
+                            </button>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/10 text-brand-500">Mode Permainan</span>
+                        </div>
+
+                        <div class="text-center max-w-md mx-auto">
+                            <h2 class="text-2xl font-black text-slate-800 dark:text-white">Pilih Mode Latihan</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Uji kemampuan matematis kamu dan kumpulkan XP terbanyak!</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Latihan Standard -->
+                            <div onclick="app.navTo('quiz', {mode: 'practice'})" class="glass-card p-6 rounded-3xl hover:border-emerald-500 transition cursor-pointer group border-l-4 border-emerald-500">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-2xl font-bold mb-4">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="font-extrabold text-lg text-slate-800 dark:text-white">Mode Latihan Bebas</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Kerjakan 10 soal acak tanpa batasan waktu. Cocok untuk mengasah pemahaman awal.</p>
+                                <div class="mt-4 inline-flex items-center space-x-2 text-xs font-bold text-emerald-500">
+                                    <span>Mulai Latihan</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+                            </div>
+
+                            <!-- Tantangan Waktu -->
+                            <div onclick="app.navTo('quiz', {mode: 'challenge'})" class="glass-card p-6 rounded-3xl hover:border-amber-500 transition cursor-pointer group border-l-4 border-amber-500">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-2xl font-bold mb-4">
+                                    <i class="fa-solid fa-stopwatch animate-pulse"></i>
+                                </div>
+                                <h3 class="font-extrabold text-lg text-slate-800 dark:text-white">⚡ Tantangan Waktu</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Pacu adrenalin! Jawab soal secepat mungkin dengan timer mundur. Dapatkan Bonus XP!</p>
+                                <div class="mt-4 inline-flex items-center space-x-2 text-xs font-bold text-amber-500">
+                                    <span>Tantang Diri</span>
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderQuizView(mode = 'practice', topicId = null) {
+                return `
+                    <div class="max-w-2xl mx-auto space-y-6 animate-pop">
+                        <!-- Quiz Header & Progress -->
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.abortQuiz()" class="text-xs font-bold text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-xmark mr-1"></i> Keluar
+                            </button>
+                            <div class="flex items-center space-x-3">
+                                <div id="combo-badge" class="hidden px-3 py-1 bg-gradient-to-r from-amber-500 to-red-500 text-white rounded-full text-xs font-black animate-bounce">
+                                    🔥 COMBO x<span id="combo-count">1</span>
+                                </div>
+                                <span id="quiz-timer" class="hidden px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full text-xs font-mono font-bold">
+                                    ⏱️ 15s
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Card -->
+                        <div class="glass-card p-6 md:p-8 rounded-3xl relative overflow-hidden">
+                            <!-- Progress Bar -->
+                            <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full mb-6 overflow-hidden">
+                                <div id="quiz-progress" class="bg-brand-600 h-full w-0 transition-all duration-300"></div>
+                            </div>
+
+                            <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-2">
+                                <span>Soal <span id="q-index">1</span> dari <span id="q-total">10</span></span>
+                                <span id="q-diff" class="uppercase text-brand-500">SULIT</span>
+                            </div>
+
+                            <h3 id="q-text" class="text-lg md:text-xl font-bold text-slate-800 dark:text-white leading-relaxed mb-6">
+                                <!-- Question text -->
+                            </h3>
+
+                            <div id="q-options" class="space-y-3">
+                                <!-- Options injected dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Feedback Box -->
+                        <div id="quiz-feedback" class="hidden p-5 rounded-2xl space-y-3 animate-pop">
+                            <!-- Feedback injected dynamically -->
+                        </div>
+                    </div>
+                `;
+            }
+
+            startQuizSession(mode, topicId) {
+                let questions = [...QUESTION_BANK];
+                if (topicId) {
+                    questions = questions.filter(q => q.topicId === topicId);
+                }
+                if (questions.length === 0) questions = [...QUESTION_BANK];
+
+                // Shuffle questions
+                questions.sort(() => Math.random() - 0.5);
+                const sessionQuestions = questions.slice(0, 10);
+
+                this.currentQuiz = {
+                    mode: mode,
+                    questions: sessionQuestions,
+                    currentIndex: 0,
+                    score: 0,
+                    combo: 0,
+                    maxCombo: 0,
+                    userAnswers: [],
+                    timerValue: 15
+                };
+
+                this.loadCurrentQuestion();
+            }
+
+            loadCurrentQuestion() {
+                const q = this.currentQuiz.questions[this.currentQuiz.currentIndex];
+                const total = this.currentQuiz.questions.length;
+
+                document.getElementById('quiz-progress').style.width = `${((this.currentQuiz.currentIndex) / total) * 100}%`;
+                document.getElementById('q-index').innerText = this.currentQuiz.currentIndex + 1;
+                document.getElementById('q-total').innerText = total;
+                document.getElementById('q-diff').innerText = q.difficulty;
+                document.getElementById('q-text').innerText = q.question;
+
+                // Hide Feedback
+                const feedbackBox = document.getElementById('quiz-feedback');
+                feedbackBox.className = 'hidden';
+
+                // Render Options
+                const optionsContainer = document.getElementById('q-options');
+                optionsContainer.innerHTML = q.options.map((opt, idx) => `
+                    <button onclick="app.submitAnswer(${idx})" class="opt-btn w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-left font-semibold text-sm md:text-base transition flex items-center justify-between border border-transparent">
+                        <span>${String.fromCharCode(65 + idx)}. ${opt}</span>
+                        <i class="fa-regular fa-circle text-slate-400"></i>
+                    </button>
+                `).join('');
+
+                // Handle Mode Timer
+                if (this.currentQuiz.mode === 'challenge') {
+                    const timerElem = document.getElementById('quiz-timer');
+                    timerElem.classList.remove('hidden');
+                    this.currentQuiz.timerValue = 15;
+                    timerElem.innerText = `⏱️ ${this.currentQuiz.timerValue}s`;
+                    
+                    clearInterval(this.quizTimer);
+                    this.quizTimer = setInterval(() => {
+                        this.currentQuiz.timerValue--;
+                        timerElem.innerText = `⏱️ ${this.currentQuiz.timerValue}s`;
+                        if (this.currentQuiz.timerValue <= 0) {
+                            clearInterval(this.quizTimer);
+                            this.submitAnswer(-1); // Time out
+                        }
+                    }, 1000);
+                }
+            }
+
+            submitAnswer(optIndex) {
+                clearInterval(this.quizTimer);
+                const q = this.currentQuiz.questions[this.currentQuiz.currentIndex];
+                const isCorrect = (optIndex === q.correct);
+                const feedbackBox = document.getElementById('quiz-feedback');
+
+                // Disable all option buttons
+                const buttons = document.querySelectorAll('.opt-btn');
+                buttons.forEach(btn => btn.onclick = null);
+
+                if (isCorrect) {
+                    sfx.correct();
+                    this.currentQuiz.score++;
+                    this.currentQuiz.combo++;
+                    if (this.currentQuiz.combo > this.currentQuiz.maxCombo) {
+                        this.currentQuiz.maxCombo = this.currentQuiz.combo;
+                    }
+
+                    if (this.currentQuiz.combo >= 3) {
+                        document.getElementById('combo-badge').classList.remove('hidden');
+                        document.getElementById('combo-count').innerText = this.currentQuiz.combo;
+                    }
+
+                    if (optIndex >= 0) buttons[optIndex].classList.add('border-emerald-500', 'bg-emerald-500/10');
+
+                    feedbackBox.className = 'glass-card p-5 rounded-2xl border-l-4 border-emerald-500 bg-emerald-500/5 animate-pop space-y-2';
+                    feedbackBox.innerHTML = `
+                        <div class="font-black text-emerald-600 dark:text-emerald-400 flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>🎉 Jawaban Benar! (+100 XP)</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">${q.explanation}</p>
+                        <button onclick="app.nextQuestion()" class="mt-2 w-full py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs">Soal Berikutnya</button>
+                    `;
+                } else {
+                    sfx.wrong();
+                    this.currentQuiz.combo = 0;
+                    document.getElementById('combo-badge').classList.add('hidden');
+
+                    if (optIndex >= 0) buttons[optIndex].classList.add('border-red-500', 'bg-red-500/10');
+                    if (q.correct < buttons.length) buttons[q.correct].classList.add('border-emerald-500', 'bg-emerald-500/10');
+
+                    feedbackBox.className = 'glass-card p-5 rounded-2xl border-l-4 border-red-500 bg-red-500/5 animate-pop space-y-2';
+                    feedbackBox.innerHTML = `
+                        <div class="font-black text-red-600 dark:text-red-400 flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            <span>💡 Jawaban Belum Tepat</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line"><b>Pembahasan:</b>\n${q.explanation}</p>
+                        <button onclick="app.nextQuestion()" class="mt-2 w-full py-2.5 bg-brand-600 text-white font-bold rounded-xl text-xs">Lanjut Soal Berikutnya</button>
+                    `;
+                }
+
+                // Update total stats
+                this.state.totalAnswered++;
+                if (isCorrect) this.state.correctAnswered++;
+                this.state.accuracy = Math.round((this.state.correctAnswered / this.state.totalAnswered) * 100);
+                this.checkAchievement("first_step");
+                if (this.currentQuiz.maxCombo >= 5) this.checkAchievement("combo_master");
+                this.saveState();
+            }
+
+            nextQuestion() {
+                this.currentQuiz.currentIndex++;
+                if (this.currentQuiz.currentIndex < this.currentQuiz.questions.length) {
+                    this.loadCurrentQuestion();
+                } else {
+                    this.finishQuizSession();
+                }
+            }
+
+            finishQuizSession() {
+                const total = this.currentQuiz.questions.length;
+                const score = this.currentQuiz.score;
+                const earnedXP = score * 100 + (this.currentQuiz.maxCombo * 20);
+                this.addXP(earnedXP);
+
+                this.showModal(`
+                    <div class="text-center space-y-4 py-2">
+                        <div class="w-16 h-16 bg-brand-500/20 text-brand-500 rounded-full flex items-center justify-center text-3xl mx-auto">
+                            <i class="fa-solid fa-trophy text-math-gold"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Sesi Latihan Selesai!</h3>
+                        <div class="grid grid-cols-2 gap-3 py-2">
+                            <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-xl">
+                                <div class="text-xs text-slate-400">Skor Benar</div>
+                                <div class="text-lg font-black text-brand-500">${score} / ${total}</div>
+                            </div>
+                            <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-xl">
+                                <div class="text-xs text-slate-400">XP Diperoleh</div>
+                                <div class="text-lg font-black text-math-gold">+${earnedXP} XP</div>
+                            </div>
+                        </div>
+                        <button onclick="app.closeModal(); app.navTo('home');" class="w-full py-3 bg-brand-600 text-white font-bold rounded-xl shadow">Kembali ke Beranda</button>
+                    </div>
+                `);
+            }
+
+            abortQuiz() {
+                clearInterval(this.quizTimer);
+                this.navTo('latihan-select');
+            }
+
+            renderRumusView() {
+                let allFormulas = [];
+                Object.keys(CURRICULUM).forEach(cKey => {
+                    CURRICULUM[cKey].topics.forEach(top => {
+                        top.content.rumus.forEach(r => {
+                            allFormulas.push({ ...r, topicTitle: top.title, classTitle: CURRICULUM[cKey].title });
+                        });
+                    });
+                });
+
+                return `
+                    <div class="space-y-6 animate-pop">
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.navTo('home')" class="text-sm font-semibold text-slate-500 flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Beranda</span>
+                            </button>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-brand-500/10 text-brand-500">Bank Rumus</span>
+                        </div>
+
+                        <!-- Search Bar -->
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                            <input type="text" id="formula-search" onkeyup="app.filterFormulas()" placeholder="Cari rumus (misal: turunan, eksponen, determinan)..." class="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <!-- Formula List -->
+                        <div id="formula-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${allFormulas.map(f => `
+                                <div class="formula-card glass-card p-5 rounded-2xl">
+                                    <div class="flex justify-between items-start">
+                                        <span class="text-[10px] font-bold px-2 py-0.5 bg-brand-500/10 text-brand-500 rounded-full">${f.classTitle}</span>
+                                        <span class="text-xs text-slate-400 font-medium">${f.topicTitle}</span>
+                                    </div>
+                                    <h4 class="font-extrabold text-slate-800 dark:text-white mt-2">${f.name}</h4>
+                                    <div class="math-font bg-slate-100 dark:bg-slate-800/80 p-3 rounded-xl text-brand-600 dark:text-brand-400 font-bold text-sm md:text-base mt-2">
+                                        ${f.eq}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            filterFormulas() {
+                const query = document.getElementById('formula-search').value.toLowerCase();
+                const cards = document.querySelectorAll('.formula-card');
+                cards.forEach(card => {
+                    const text = card.innerText.toLowerCase();
+                    if (text.includes(query)) card.style.display = 'block';
+                    else card.style.display = 'none';
+                });
+            }
+
+            renderKalkulatorView() {
+                return `
+                    <div class="max-w-md mx-auto space-y-6 animate-pop">
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.navTo('home')" class="text-sm font-semibold text-slate-500 flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Beranda</span>
+                            </button>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-500">Kalkulator Sains</span>
+                        </div>
+
+                        <div class="glass-card p-5 rounded-3xl space-y-4">
+                            <!-- Display -->
+                            <div class="bg-slate-900 p-4 rounded-2xl text-right">
+                                <div id="calc-expression" class="text-xs text-slate-400 font-mono h-4"></div>
+                                <div id="calc-display" class="text-2xl md:text-3xl font-black text-white font-mono mt-1 overflow-x-auto">0</div>
+                            </div>
+
+                            <!-- Buttons Pad -->
+                            <div class="grid grid-cols-4 gap-2 text-sm font-bold">
+                                <button onclick="app.calcInput('C')" class="p-3 rounded-xl bg-red-500/10 text-red-500">C</button>
+                                <button onclick="app.calcInput('(')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800">(</button>
+                                <button onclick="app.calcInput(')')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800">)</button>
+                                <button onclick="app.calcInput('/')" class="p-3 rounded-xl bg-brand-500/10 text-brand-500">÷</button>
+
+                                <button onclick="app.calcInput('sin(')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs">sin</button>
+                                <button onclick="app.calcInput('cos(')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs">cos</button>
+                                <button onclick="app.calcInput('tan(')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs">tan</button>
+                                <button onclick="app.calcInput('*')" class="p-3 rounded-xl bg-brand-500/10 text-brand-500">×</button>
+
+                                <button onclick="app.calcInput('7')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">7</button>
+                                <button onclick="app.calcInput('8')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">8</button>
+                                <button onclick="app.calcInput('9')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">9</button>
+                                <button onclick="app.calcInput('-')" class="p-3 rounded-xl bg-brand-500/10 text-brand-500">-</button>
+
+                                <button onclick="app.calcInput('4')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">4</button>
+                                <button onclick="app.calcInput('5')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">5</button>
+                                <button onclick="app.calcInput('6')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">6</button>
+                                <button onclick="app.calcInput('+')" class="p-3 rounded-xl bg-brand-500/10 text-brand-500">+</button>
+
+                                <button onclick="app.calcInput('1')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">1</button>
+                                <button onclick="app.calcInput('2')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">2</button>
+                                <button onclick="app.calcInput('3')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">3</button>
+                                <button onclick="app.calcInput('sqrt(')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs">√</button>
+
+                                <button onclick="app.calcInput('0')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">0</button>
+                                <button onclick="app.calcInput('.')" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">.</button>
+                                <button onclick="app.calcEval()" class="col-span-2 p-3 rounded-xl bg-brand-600 text-white shadow font-black">=</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            initCalculatorLogic() {
+                this.calcExpr = "";
+                this.checkAchievement("calculator_pro");
+            }
+
+            calcInput(val) {
+                sfx.click();
+                if (val === 'C') {
+                    this.calcExpr = "";
+                } else {
+                    this.calcExpr += val;
+                }
+                document.getElementById('calc-display').innerText = this.calcExpr || "0";
+            }
+
+            calcEval() {
+                sfx.click();
+                try {
+                    let sanitized = this.calcExpr
+                        .replace(/sin\(/g, 'Math.sin(')
+                        .replace(/cos\(/g, 'Math.cos(')
+                        .replace(/tan\(/g, 'Math.tan(')
+                        .replace(/sqrt\(/g, 'Math.sqrt(');
+                    let res = eval(sanitized);
+                    document.getElementById('calc-expression').innerText = this.calcExpr + ' =';
+                    document.getElementById('calc-display').innerText = res;
+                    this.calcExpr = res.toString();
+                } catch(e) {
+                    document.getElementById('calc-display').innerText = "Error";
+                    this.calcExpr = "";
+                }
+            }
+
+            renderProfilView() {
+                return `
+                    <div class="max-w-xl mx-auto space-y-6 animate-pop">
+                        <div class="glass-card p-6 rounded-3xl text-center relative overflow-hidden">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-brand-600 to-math-purple text-white flex items-center justify-center text-3xl font-black mx-auto mb-3 shadow-lg">
+                                <i class="fa-solid fa-user-astronaut"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">${this.state.name}</h3>
+                            <p class="text-xs text-brand-500 font-bold mt-0.5">Level ${this.state.level} • Petualang SMA</p>
+
+                            <div class="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <div>
+                                    <div class="text-xs text-slate-400">Total XP</div>
+                                    <div class="text-base font-black text-brand-500">${this.state.xp}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-400">Akurasi</div>
+                                    <div class="text-base font-black text-emerald-500">${this.state.accuracy}%</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-400">Streak</div>
+                                    <div class="text-base font-black text-amber-500">${this.state.streak} Hari</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Achievements Grid -->
+                        <div class="glass-card p-6 rounded-3xl">
+                            <h4 class="font-extrabold text-slate-800 dark:text-white text-base mb-4 flex items-center space-x-2">
+                                <i class="fa-solid fa-award text-amber-500"></i>
+                                <span>Pencapaian Kamu</span>
+                            </h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                ${ACHIEVEMENTS.map(ach => {
+                                    const unlocked = this.state.unlockedAchievements.includes(ach.id);
+                                    return `
+                                        <div class="p-3 rounded-2xl border ${unlocked ? 'bg-slate-100 dark:bg-slate-800/80 border-amber-500/30' : 'opacity-40 border-slate-200 dark:border-slate-800'} flex items-center space-x-3">
+                                            <div class="text-2xl ${ach.color}"><i class="fa-solid ${ach.icon}"></i></div>
+                                            <div>
+                                                <div class="font-bold text-xs text-slate-800 dark:text-white">${ach.title}</div>
+                                                <div class="text-[10px] text-slate-400">${ach.desc}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- PWA & Export Section -->
+                        <div class="glass-card p-6 rounded-3xl space-y-4">
+                            <h4 class="font-extrabold text-slate-800 dark:text-white text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-mobile-screen-button text-brand-500"></i>
+                                <span>Aplikasi & PWABuilder / APK</span>
+                            </h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Game ini dibangun dengan arsitektur PWA offline-first modern. Kamu dapat langsung mendepoy file HTML tunggal ini ke server web HTTPS (Vercel / GitHub Pages / Netlify) untuk mendapatkan URL publik bagi PWABuilder.
+                            </p>
+                            <button onclick="app.showPWAInstructions()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Lihat Petunjuk Deployment & APK</span>
+                            </button>
+                        </div>
+
+                        <!-- Reset Progress Button -->
+                        <button onclick="app.confirmReset()" class="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-xl text-xs transition">
+                            Reset Progres Belajar
+                        </button>
+                    </div>
+                `;
+            }
+
+            renderProgresView() {
+                return `
+                    <div class="space-y-6 animate-pop">
+                        <div class="flex items-center justify-between">
+                            <button onclick="app.navTo('home')" class="text-sm font-semibold text-slate-500 flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Beranda</span>
+                            </button>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500">Statistik Belajar</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="glass-card p-6 rounded-3xl space-y-3">
+                                <h4 class="font-bold text-slate-800 dark:text-white text-sm">Ringkasan Aktivitas</h4>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800">
+                                        <span class="text-slate-400">Materi Dibaca:</span>
+                                        <span class="font-bold">${this.state.readMaterials.length} Modul</span>
+                                    </div>
+                                    <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800">
+                                        <span class="text-slate-400">Total Soal Dijawab:</span>
+                                        <span class="font-bold">${this.state.totalAnswered} Soal</span>
+                                    </div>
+                                    <div class="flex justify-between py-1">
+                                        <span class="text-slate-400">Jawaban Benar:</span>
+                                        <span class="font-bold text-emerald-500">${this.state.correctAnswered} Soal</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-card p-6 rounded-3xl space-y-3">
+                                <h4 class="font-bold text-slate-800 dark:text-white text-sm">Target Tingkat Penguasaan</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1">
+                                            <span>Kelas X</span>
+                                            <span>65%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div class="bg-blue-500 h-full w-[65%]"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1">
+                                            <span>Kelas XI</span>
+                                            <span>40%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div class="bg-emerald-500 h-full w-[40%]"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1">
+                                            <span>Kelas XII</span>
+                                            <span>20%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div class="bg-purple-500 h-full w-[20%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showPWAInstructions() {
+                this.showModal(`
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-cloud"></i>
+                            <span>Panduan PWABuilder & Deployment</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Aplikasi ini disiapkan untuk di-host pada penyedia HTTPS gratis seperti **GitHub Pages** atau **Vercel** sebelum dikonversi menjadi file **.APK / .AAB Android**.
+                        </p>
+                        <ol class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-decimal pl-4">
+                            <li>Upload file HTML ini ke repository GitHub atau Vercel.</li>
+                            <li>Dapatkan URL HTTPS publik aplikasi Anda (contoh: <code>https://math-adventure.vercel.app</code>).</li>
+                            <li>Buka situs <a href="https://www.pwabuilder.com" target="_blank" class="text-brand-500 underline">PWABuilder.com</a>.</li>
+                            <li>Masukkan URL HTTPS Anda, lalu klik "Build My PWA" untuk mengunduh package APK Android.</li>
+                        </ol>
+                        <button onclick="app.closeModal()" class="w-full py-2.5 bg-brand-600 text-white font-bold rounded-xl text-xs">Paham</button>
+                    </div>
+                `);
+            }
+
+            confirmReset() {
+                this.showModal(`
+                    <div class="text-center space-y-4">
+                        <div class="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-xl mx-auto">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Reset Seluruh Progres?</h3>
+                        <p class="text-xs text-slate-500">Tindakan ini akan menghapus seluruh XP, Level, dan Achievement kamu. Tindakan tidak dapat dibatalkan.</p>
+                        <div class="flex space-x-2 pt-2">
+                            <button onclick="app.closeModal()" class="flex-1 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs">Batal</button>
+                            <button onclick="localStorage.clear(); location.reload();" class="flex-1 py-2 bg-red-600 text-white font-bold rounded-xl text-xs">Ya, Reset</button>
+                        </div>
+                    </div>
+                `);
+            }
+        }
+
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new MathAdventureApp();
+            app.init();
+        });
+    </script>
+</body>
+</html>
